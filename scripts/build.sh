@@ -5,7 +5,8 @@ touch ./public/.nojekyll
 rsync -av images public/
 rsync -av render public/
 rsync -av site_libs public/
-rsync index.html render public/
+# rsync index.html public/
+cp index2.html public/
 ORGANIZATION=$1
 REPO=$2
 
@@ -14,6 +15,7 @@ REPO=$2
 # sed -i "s/{{repo}}/$REPO/g" "./public/index.html"
 
 temp_file=$(mktemp)  # Create a temporary file
+temp_file_for_links=$(mktemp)  # Create a temporary file
 sidebar_temp_file=$(mktemp)  # Create a temporary file
 
 # Function to replace non-HTML characters with their HTML equivalents
@@ -43,17 +45,10 @@ for dir in ./render/*; do
 
         # Create an HTML file with the HTML-safe directory name
         template_file="./public/${html_safe_dir_name}.html"
-        echo "${template_file}: $dir_name"
         html_path="${html_safe_dir_name}.html"
         cp index.html "$template_file"
 
-        echo "ORGANIZATION:$ORGANIZATION"
-        echo "REPO:$REPO"
-        echo "template_file:$template_file"
-        echo "html_safe_dir_name:$html_safe_dir_name"
         sidebarItems=$(cat "$sidebar_temp_file")
-        echo "sidebarItems:$sidebarItems"
-
         sed -i "s/{{organization}}/$ORGANIZATION/g" "$template_file"
         sed -i "s/{{repo}}/$REPO/g" "$template_file"
         sed -i "s/{{source}}/$html_safe_dir_name/g" "$template_file"
@@ -61,21 +56,28 @@ for dir in ./render/*; do
         wc -l "$sidebar_temp_file"
         cat "$sidebar_temp_file"
         sed -i "s|{{sidebar}}|$sidebarItems|g" "$template_file"
+        sed -i "s|{{sidebar}}|$sidebarItems|g" "./public/index.html"
         
         # Loop through files in the directory
-        echo "DIR: $dir"
         echo "" > "$temp_file"
+        echo "" > "$temp_file_for_links"
         for file in "$dir/"*; do
             # if [ -f "$file" ]; then
                 ls -lha "$dir"
-                echo "file:$file"
                 filename=$(basename "$file")
-                echo "filename: $filename"
                 filename_no_extension="${filename%.*}"
                 # Creating the section with the filename and appending to the temporary file
-                echo "<div class=\"quarto-layout-row quarto-layout-valign-top\"><div class=\"quarto-layout-cell quarto-layout-cell-subref\" style=\"flex-basis: 100%; justify-content: center\" ><div id=\"fig-${filename_no_extension}\" class=\"quarto-figure quarto-figure-center anchored\" ><figure class=\"figure\"><p><img src=\"/$REPO/render/${html_safe_dir_name}/${filename}/${filename}.png\" class=\"img-fluid figure-img\" data-ref-parent=\"fig-figure3.1\" /></p><p></p><figcaption class=\"figure-caption\"> ${filename_no_extension} </figcaption><p></p></figure></div></div></div>" >> "$temp_file"                
+                echo "<div class=\"quarto-layout-row quarto-layout-valign-top\"><div class=\"quarto-layout-cell quarto-layout-cell-subref\" style=\"flex-basis: 100%; justify-content: center\" ><div id=\"fig-${filename_no_extension}\" class=\"quarto-figure quarto-figure-center anchored\" ><figure class=\"figure\"><p><img src=\"/$REPO/render/${html_safe_dir_name}/${filename}/${filename}.png\" class=\"img-fluid figure-img\" data-ref-parent=\"fig-figure3.1\" /></p><p></p><figcaption class=\"figure-caption\"> ${filename_no_extension} </figcaption><p></p></figure></div></div></div>" >> "$temp_file"   
+                echo "<li> <a href=\"#sec-introduction\" id=\"toc-sec-introduction\" class=\"nav-link active\" data-scroll-target=\"#fig-${filename_no_extension}\" >${filename_no_extension}</a></li>" >> "$temp_file_for_links"   
+
+                             
             # fi
         done
         sed -i "s/{{section}}/$(sed 's:/:\\/:g' $temp_file | tr -d '\n')/g" "$template_file"
+        sed -i "s/{{links}}/$(sed 's:/:\\/:g' $temp_file_for_links | tr -d '\n')/g" "$template_file"
     fi
 done
+
+
+
+## index.html
