@@ -5,7 +5,8 @@ touch ./public/.nojekyll
 rsync -av images public/
 rsync -av render public/
 rsync -av site_libs public/
-rsync index.html render public/
+# rsync index.html public/
+cp index2.html public/index.html
 ORGANIZATION=$1
 REPO=$2
 
@@ -49,12 +50,18 @@ for dir in ./render/*; do
 
         sidebarItems=$(cat "$sidebar_temp_file")
         sed -i "s/{{organization}}/$ORGANIZATION/g" "$template_file"
+        sed -i "s/{{organization}}/$ORGANIZATION/g" "./public/index.html"
+
         sed -i "s/{{repo}}/$REPO/g" "$template_file"
+        sed -i "s/{{repo}}/$REPO/g" "./public/index.html"
+
         sed -i "s/{{source}}/$html_safe_dir_name/g" "$template_file"
+        sed -i "s/{{source}}/$html_safe_dir_name/g" "./public/index.html"
         
         wc -l "$sidebar_temp_file"
         cat "$sidebar_temp_file"
         sed -i "s|{{sidebar}}|$sidebarItems|g" "$template_file"
+        sed -i "s|{{sidebar}}|$sidebarItems|g" "./public/index.html"
         
         # Loop through files in the directory
         echo "" > "$temp_file"
@@ -72,6 +79,10 @@ for dir in ./render/*; do
             # fi
         done
         sed -i "s/{{section}}/$(sed 's:/:\\/:g' $temp_file | tr -d '\n')/g" "$template_file"
-        sed -i "s/{{links}}/$(sed 's:/:\\/:g' $temp_file | tr -d '\n')/g" "$temp_file_for_links"
+        sed -i "s/{{links}}/$(sed 's:/:\\/:g' $temp_file_for_links | tr -d '\n')/g" "$template_file"
     fi
 done
+
+
+
+## index.html
