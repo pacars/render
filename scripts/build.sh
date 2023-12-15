@@ -62,6 +62,12 @@ for org_dir in ./render/*; do
             fi 
         done
 
+        echo "|||||||||||||||||||||||{{{{{{{{{{{{{{{{||}}}}}}}}}}}}}}}}"
+        echo "|||||||||||||||||||||||{{{{{{{{{{{{{{{{||}}}}}}}}}}}}}}}}"
+        echo "|||||||||||||||||||||||{{{{{{{{{{{{{{{{||}}}}}}}}}}}}}}}}"
+        echo "|||||||||||||||||||||||{{{{{{{{{{{{{{{{||}}}}}}}}}}}}}}}}"
+        echo "|||||||||||||||||||||||{{{{{{{{{{{{{{{{||}}}}}}}}}}}}}}}}"
+        echo $sidebarItems_2 
         sidebarItems_2=$(cat "$sidebar_temp_file_2")
         sed -i "s|{{sidebar}}|$sidebarItems_2|g" "$template_file"
         sed -i "s/{{organization}}/$ORGANIZATION/g" "$template_file"
@@ -106,6 +112,10 @@ for org_dir in ./render/*; do
                 # sed -i "s|{{links}}|$(sed 's:/:\\/:g' $temp_file_for_links | tr -d '\n')|g" "$template_file"
             fi
         done
+        echo ".........."
+        echo ".........."
+        echo ".........."
+        echo ".........."
     fi
 done
 
